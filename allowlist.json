@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "sources": [
+    {"source_id": "PAPER-001", "allowed": true, "source_type": "paper", "domain": "journals.example-oa.org"},
+    {"source_id": "PAPER-002", "allowed": true, "source_type": "paper", "domain": "nejm.example.org"},
+    {"source_id": "PAPER-003", "allowed": false, "source_type": "paper", "domain": "predatory-journal.example.com"},
+    {"source_id": "PAPER-004", "allowed": true, "source_type": "paper", "domain": "journals.example-oa.org"},
+    {"source_id": "PATENT-001", "allowed": true, "source_type": "patent", "domain": "uspto.gov"},
+    {"source_id": "TRIAL-001", "allowed": true, "source_type": "trial_registry", "domain": "clinicaltrials.gov"},
+    {"source_id": "TRIAL-002", "allowed": true, "source_type": "trial_registry", "domain": "clinicaltrials.gov"},
+    {"source_id": "TRIAL-003", "allowed": false, "source_type": "trial_registry", "domain": "unverified-registry.example.com"},
+    {"source_id": "REPORT-001", "allowed": true, "source_type": "internal_report", "domain": "internal"},
+    {"source_id": "REPORT-002", "allowed": true, "source_type": "internal_report", "domain": "internal"},
+    {"source_id": "REPORT-003", "allowed": false, "source_type": "internal_report", "domain": "internal"}
+  ]
+}

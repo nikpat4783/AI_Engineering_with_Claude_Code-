@@ -1,0 +1,7 @@
+{
+  "reviewers": [
+    {"id": "jsmith", "name": "Jane Smith"},
+    {"id": "rjones", "name": "Robert Jones"},
+    {"id": "achen", "name": "Alice Chen"}
+  ]
+}

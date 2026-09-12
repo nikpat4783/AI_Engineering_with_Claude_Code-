@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Triage Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .section h2 {
+            font-size: 18px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        input, textarea, select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: "Segoe UI", monospace;
+        }
+        button {
+            padding: 11px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .examples {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .example-btn {
+            background: #e9ecef;
+            color: #333;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .example-btn:hover {
+            background: #dee2e6;
+            border-color: #667eea;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .result-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+        .status-answered {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-low_confidence {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-refused {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-escalated {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-pending_review {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .confidence-bar {
+            background: #e9ecef;
+            border-radius: 4px;
+            height: 20px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 12px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .gap-item {
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-left: 3px solid #ffc107;
+            border-radius: 3px;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        .loading.active {
+            display: block;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+        .collapsible {
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            user-select: none;
+        }
+        .collapsible.open {
+            background: #dee2e6;
+        }
+        .collapsible-content {
+            display: none;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            padding: 15px;
+            border-radius: 0 0 6px 6px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .collapsible-content.open {
+            display: block;
+        }
+        .audit-entry {
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-left: 2px solid #667eea;
+            border-radius: 2px;
+        }
+        @media (max-width: 900px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Evidence Triage Assistant</h1>
+            <p>Ask a research question. Get structured, grounded evidence with confidence scores.</p>
+        </div>
+
+        <div class="content">
+            <!-- Left: Input & Examples -->
+            <div class="section">
+                <h2>Ask a Question</h2>
+
+                <div class="form-group">
+                    <label for="apiKey">Groq API Key</label>
+                    <input type="password" id="apiKey" placeholder="gsk_..."
+                           title="Your API key is sent only with each request and never stored on the server.">
+                    <small style="color: #999; font-size: 12px;">Kept in your browser session only, never stored server-side.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="question">Question</label>
+                    <textarea id="question" placeholder="What evidence supports NX-14 for treating idiopathic pulmonary fibrosis, and is it safe?"></textarea>
+                </div>
+
+                <button onclick="askQuestion()" style="width: 100%;">Ask</button>
+
+                <div class="loading" id="loading">
+                    <p>⏳ Processing...</p>
+                </div>
+
+                <h2 style="margin-top: 20px;">Example Questions</h2>
+                <div class="examples">
+                    <div class="example-btn" onclick="setExample('confident')">
+                        <strong>✓ Confident Answer</strong><br>
+                        <small>What evidence supports NX-14 for treating idiopathic pulmonary fibrosis, and is it safe?</small>
+                    </div>
+                    <div class="example-btn" onclick="setExample('lowconf')">
+                        <strong>⚠ Low Confidence</strong><br>
+                        <small>Are there safety concerns about NX-14 across indications, including liver effects?</small>
+                    </div>
+                    <div class="example-btn" onclick="setExample('refused')">
+                        <strong>✗ Refused (No Evidence)</strong><br>
+                        <small>What evidence supports compound ZX-88 for treating pancreatic cancer?</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Results & Review -->
+            <div class="section">
+                <h2>Result</h2>
+                <div id="resultArea"></div>
+
+                <h2 style="margin-top: 20px;">Review & Audit</h2>
+
+                <div class="form-group">
+                    <label for="reviewer">Reviewer</label>
+                    <select id="reviewer"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Decision</label>
+                    <div style="display: flex; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 6px; font-weight: normal;">
+                            <input type="radio" name="decision" value="approve" checked> Approve
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; font-weight: normal;">
+                            <input type="radio" name="decision" value="reject"> Reject
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reviewNotes">Notes</label>
+                    <textarea id="reviewNotes" style="min-height: 60px;" placeholder="Optional review notes..."></textarea>
+                </div>
+
+                <button id="reviewBtn" onclick="submitReview()" style="width: 100%; display: none;">Submit Review</button>
+                <div id="reviewMessage"></div>
+
+                <h2 style="margin-top: 20px;">Recent Results</h2>
+                <div id="resultsList" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+
+                <div class="collapsible" onclick="toggleAudit()" style="margin-top: 20px;">📋 Audit Log</div>
+                <div class="collapsible-content" id="auditContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentResultId = null;
+        const examples = {
+            confident: "What evidence supports NX-14 for treating idiopathic pulmonary fibrosis, and is it safe?",
+            lowconf: "Are there safety concerns about NX-14 across indications, including liver effects?",
+            refused: "What evidence supports compound ZX-88 for treating pancreatic cancer?"
+        };
+
+        // Load reviewers on startup
+        async function loadReviewers() {
+            const resp = await fetch("/api/reviewers");
+            const reviewers = await resp.json();
+            const select = document.getElementById("reviewer");
+            select.innerHTML = reviewers.map(r =>
+                `<option value="${r.id}">${r.name} (${r.id})</option>`
+            ).join("");
+            loadResultsList();
+        }
+
+        function setExample(key) {
+            document.getElementById("question").value = examples[key];
+            document.getElementById("apiKey").focus();
+        }
+
+        async function askQuestion() {
+            const apiKey = document.getElementById("apiKey").value.trim();
+            const question = document.getElementById("question").value.trim();
+            const resultArea = document.getElementById("resultArea");
+            const loading = document.getElementById("loading");
+
+            if (!apiKey) {
+                resultArea.innerHTML = '<div class="error">⚠️ Please enter your Groq API key</div>';
+                return;
+            }
+            if (!question) {
+                resultArea.innerHTML = '<div class="error">⚠️ Please enter a question</div>';
+                return;
+            }
+
+            resultArea.innerHTML = "";
+            loading.classList.add("active");
+            document.getElementById("reviewBtn").style.display = "none";
+
+            try {
+                const resp = await fetch("/api/ask", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question, groq_api_key: apiKey })
+                });
+                const data = await resp.json();
+
+                if (data.error) {
+                    resultArea.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                    return;
+                }
+
+                currentResultId = data.result_id;
+                renderResult(data.result);
+                document.getElementById("reviewBtn").style.display = "block";
+                loadResultsList();
+                loadAudit();
+            } catch (e) {
+                resultArea.innerHTML = `<div class="error">❌ Request failed: ${e.message}</div>`;
+            } finally {
+                loading.classList.remove("active");
+            }
+        }
+
+        function renderResult(result) {
+            const resultArea = document.getElementById("resultArea");
+            const statusClass = `status-${result.status}`;
+            const confidencePercent = Math.round((result.confidence.score || 0) * 100);
+
+            let html = `
+                <div class="result">
+                    <span class="result-status ${statusClass}">${result.status.toUpperCase()}</span>
+            `;
+
+            if (result.review_status === "pending") {
+                html += '<span class="result-status status-pending_review">⏳ PENDING REVIEW</span>';
+            }
+
+            if (result.answer) {
+                html += `<p style="line-height: 1.5; margin: 12px 0;">${escapeHtml(result.answer)}</p>`;
+            }
+
+            html += `
+                <p><strong>Confidence:</strong> ${result.confidence.level}</p>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: ${confidencePercent}%">
+                        ${result.confidence.score.toFixed(2)}
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: #666;">${escapeHtml(result.confidence.rationale)}</p>
+            `;
+
+            if (result.citations && result.citations.length > 0) {
+                html += `<p><strong>Citations (${result.citations.length}):</strong></p><table>
+                    <tr><th>Source</th><th>Title</th><th>Status</th><th>Score</th></tr>`;
+                result.citations.forEach(c => {
+                    const score = (c.relevance_score || 0).toFixed(2);
+                    html += `<tr>
+                        <td><code>${c.source_id}</code></td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(c.title)}</td>
+                        <td><small>${c.status}</small></td>
+                        <td>${score}</td>
+                    </tr>`;
+                });
+                html += `</table>`;
+            } else if (result.status !== "answered" && result.status !== "low_confidence") {
+                html += `<p style="color: #999; font-size: 13px;"><em>No citations.</em></p>`;
+            }
+
+            if (result.gaps && result.gaps.length > 0) {
+                html += `<p><strong>Gaps / Caveats:</strong></p>`;
+                result.gaps.forEach(g => {
+                    html += `<div class="gap-item">${escapeHtml(g)}</div>`;
+                });
+            }
+
+            html += `</div>`;
+            resultArea.innerHTML = html;
+        }
+
+        async function submitReview() {
+            if (!currentResultId) {
+                alert("No result to review.");
+                return;
+            }
+
+            const reviewer = document.getElementById("reviewer").value;
+            const decision = document.querySelector('input[name="decision"]:checked').value;
+            const notes = document.getElementById("reviewNotes").value;
+            const msg = document.getElementById("reviewMessage");
+
+            msg.innerHTML = "";
+
+            try {
+                const resp = await fetch("/api/review", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ result_id: currentResultId, reviewer_id: reviewer, decision, notes })
+                });
+                const data = await resp.json();
+
+                if (data.success) {
+                    msg.innerHTML = `<div class="success">✓ ${data.message}</div>`;
+                    currentResultId = null;
+                    document.getElementById("reviewBtn").style.display = "none";
+                    loadResultsList();
+                    loadAudit();
+                } else {
+                    msg.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+                }
+            } catch (e) {
+                msg.innerHTML = `<div class="error">❌ ${e.message}</div>`;
+            }
+        }
+
+        async function loadResultsList() {
+            try {
+                const resp = await fetch("/api/results");
+                const results = await resp.json();
+                const container = document.getElementById("resultsList");
+                if (results.length === 0) {
+                    container.innerHTML = "<em>No results yet.</em>";
+                    return;
+                }
+                let html = '<table style="margin: 0;"><tr><th>Status</th><th>Review</th><th>Citations</th><th>When</th></tr>';
+                results.slice(0, 10).forEach(r => {
+                    const when = new Date(r.generated_at).toLocaleString();
+                    const reviewBadge = r.review_status === "pending" ? "⏳" : "✓";
+                    html += `<tr>
+                        <td><small>${r.status}</small></td>
+                        <td>${reviewBadge}</td>
+                        <td>${r.num_citations}</td>
+                        <td style="font-size: 11px;">${when}</td>
+                    </tr>`;
+                });
+                html += `</table>`;
+                container.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function toggleAudit() {
+            const content = document.getElementById("auditContent");
+            const btn = event.target.closest(".collapsible");
+            btn.classList.toggle("open");
+            content.classList.toggle("open");
+            if (content.classList.contains("open")) {
+                loadAudit();
+            }
+        }
+
+        async function loadAudit() {
+            try {
+                const resp = await fetch("/api/audit");
+                const events = await resp.json();
+                const container = document.getElementById("auditContent");
+                if (events.length === 0) {
+                    container.innerHTML = "<em>No events yet.</em>";
+                    return;
+                }
+                let html = "";
+                events.slice().reverse().forEach(e => {
+                    const time = new Date(e.timestamp).toLocaleTimeString();
+                    html += `<div class="audit-entry">
+                        <strong>${time}</strong> — <code>${e.event_type}</code><br>
+                        <small>${JSON.stringify(e, null, 2).split('\n').slice(0, 3).join('\n')}${Object.keys(e).length > 3 ? '...' : ''}</small>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        // Initialize
+        window.addEventListener("load", loadReviewers);
+    </script>
+</body>
+</html>

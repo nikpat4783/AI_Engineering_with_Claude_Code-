@@ -1,0 +1,9 @@
+{
+  "source_id": "REPORT-003",
+  "source_type": "internal_report",
+  "title": "Internal QA audit: Data integrity issue in NX-14 preclinical dataset (retracted)",
+  "date": "2021-02-15",
+  "org_or_venue": "Company Quality Assurance",
+  "status": "retracted",
+  "body": "This report has been retracted. An internal audit identified data integrity issues in the preclinical efficacy dataset for NX-14. Laboratory notebooks were not properly maintained, and raw data could not be reconciled with reported results. The preclinical work was flagged for re-evaluation. This document should not be used to support any regulatory submission or scientific claim."
+}

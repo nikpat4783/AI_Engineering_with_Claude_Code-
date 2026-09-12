@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "triage-corpus": {
+      "type": "stdio",
+      "command": "python3",
+      "args": ["-m", "mcp_server.server"],
+      "env": {
+        "TRIAGE_ALLOWLIST_PATH": "${CLAUDE_PROJECT_DIR}/allowlist.json",
+        "TRIAGE_CORPUS_DIR": "${CLAUDE_PROJECT_DIR}/corpus/docs"
+      }
+    }
+  }
+}
