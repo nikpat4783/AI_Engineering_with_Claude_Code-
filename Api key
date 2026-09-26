@@ -26,3 +26,28 @@ Primary-care EHR platform that reduces chart-review and documentation burden for
 
 5. Commure - Clinical Documentation Automation at Scale
 Automates clinical documentation generation directly from patient encounters, saving clinicians milions of hours.
+
+
+
+
+Build your sixth POC using Claude- Al-DLC 
+Step 1: Identify the Problem Statement 
+Step 2: Plan the AIDLC using Claude Chat 
+Step 3: Use Claude code for creating directory and add Skills.md and Hooks setting file 
+Step 4: Create 2 sub-agents for frontend and backend 
+Step 5: Create P3-Triage-Agent for review and report 
+Step 6: Create Isolation context for sub-agents 
+Step 7: Set the Delegation 
+Step 8: Context trimming (Divide sub-agent memory allocation in context window along with instruction storing only summary of the entire histo 12-15% of the corpus. Then to use latest 8-10 prompts) 
+Step 9: Reusable setup and configuration primarily for scalable Al products 
+Step 10: Add plugins (tools) for sub-agents (internally) and from official Claude (claude.com/plugins)- For external plugins 
+Step 11: Build a RAG engine for essential/required features 
+Step 12: Test, review and make report on app dev using code-review plugin 
+Step 13: Create MCP server (https://lmcpservers.org/) 
+Step 14: Build a custom MCP server for reusable orchestrated app dev 
+Step 15: Observability- Open Telemetry + Grafana/SigNoz-> Traces/Logs/Metric 
+Step 16: Load testing- JMeter/K6 + Visualisation in dashboard 
+Step 17: Knowledge vault for activating readme mode using Obsidian 
+Step 18: Creating relational nodes for graphical database using Graphify 
+Step 19: Test and improve the POC with Prompt Engineering 
+Step 20: Demonstrate the POC for first user
